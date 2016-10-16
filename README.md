@@ -40,5 +40,5 @@ The general workflow is:
   - If fik is None, the EET servers returned an error, you can query it using keys 'kod' and 'message'
   - If fik is not None, then it contains FIK returned from the servers
 
-The code above sen the payments to the EET Playgroud by default. To use different servers (production), use `eet_url` parameter in EET constructor.
+The code above sends the payments to the EET Playgroud by default. To use different servers (production), use `eet_url` parameter in EET constructor.
 
