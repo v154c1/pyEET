@@ -24,9 +24,9 @@ class EET:
         self._signing = Signing(cert_file, password)
 
         components = self._signing.get_cert_subject().get_components()
-        cn = [x for x in components if x[0] == 'CN']
+        cn = [x for x in components if x[0] == b'CN']
         assert(len(cn) == 1)
-        self._dic = cn[0][1]
+        self._dic = cn[0][1].decode('utf8')
         print('DIC: %s' % self._dic)
 
     def create_payment(self, poradi, amount, first=True, test=True):

@@ -5,7 +5,12 @@ Created on 12. 10. 2016
 '''
 
 from lxml import etree
-import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
+    
 import hashlib
 import uuid
 from eet_ns import *
@@ -69,7 +74,7 @@ namespaces_dict = {
 
 def get_normalized_subtree(node, includive_prefixes=[]):
     tree = etree.ElementTree(node)
-    ss = StringIO.StringIO()
+    ss = StringIO()
     tree.write_c14n(
         ss, exclusive=True, inclusive_ns_prefixes=includive_prefixes)
     return ss.getvalue()
@@ -82,7 +87,7 @@ def calculate_node_digest(node):
 
 
 def soap_wsse(payload_node, signing):
-    '''Stores payload_node into a SOPA envelope and calculates the wsse signature
+    '''Stores payload_node into a SOAP envelope and calculates the wsse signature
     
     Keyword arguments:
     payload_node - top node for the payload (lxml.Element)
@@ -91,21 +96,15 @@ def soap_wsse(payload_node, signing):
     # Prepare parser
     parser = etree.XMLParser(remove_blank_text=True, ns_clean=False)
     # Prepare IDs for header
-    body_id = 'id-'+uuid.uuid4().get_hex()
-    cert_id = 'X509-'+uuid.uuid4().get_hex()
-    sig_id = 'SIG-' + uuid.uuid4().get_hex()
-    key_id = 'KI-'+ uuid.uuid4().get_hex()
-    sec_token_id='STR-'+ uuid.uuid4().get_hex()
-
-#     body_id = 'id-874636aa99da4d19a3edc6013b81c725'
-#     cert_id = 'X509-67a252aca8ae4828aecfb092128277d9'
-#     sig_id = 'SIG-fe080e8070694b61ab02fc821222c9f9'
-#     key_id = 'KI-95fc8c906a3f4ac1a13145e1b795164c'
-#     sec_token_id = 'STR-020d884701ec45d7a619849e112cfbfa'
+    body_id = 'id-'+uuid.uuid4().hex
+    cert_id = 'X509-'+uuid.uuid4().hex
+    sig_id = 'SIG-' + uuid.uuid4().hex
+    key_id = 'KI-'+ uuid.uuid4().hex
+    sec_token_id='STR-'+ uuid.uuid4().hex
 
     values = dict(namespaces_dict)
     values.update({'body_id': body_id, 'cert_id': cert_id, 'sig_id': sig_id, 'key_id':
-                   key_id, 'sec_token_id': sec_token_id, 'sec_token': base64.b64encode(signing.get_cert_binary())})
+                   key_id, 'sec_token_id': sec_token_id, 'sec_token': base64.b64encode(signing.get_cert_binary()).decode('utf8')})
 
     # Create SOAP envelope
     envelope = etree.XML(envelope_template.substitute(values), parser=parser)

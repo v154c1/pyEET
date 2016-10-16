@@ -9,7 +9,7 @@ from OpenSSL import crypto
 class Signing(object):
 
     def __init__(self, pkcs, password):
-        self._pkcs = crypto.load_pkcs12(open(pkcs).read(), password)
+        self._pkcs = crypto.load_pkcs12(open(pkcs, 'rb').read(), password)
         self._cert = self._pkcs.get_certificate()
         self._key = self._pkcs.get_privatekey()
 
